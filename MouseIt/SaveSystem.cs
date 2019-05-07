@@ -52,12 +52,29 @@ namespace MouseIt
             using (StreamWriter file = File.CreateText("profiles.json"))
             {
                 JsonSerializer serializer = new JsonSerializer();
-
                 serializer.Serialize(file, prof);
             }
         }
+        
+        public static int GetuID()
+        {
+            string pathy = "profile.txt";
+            if (!File.Exists(pathy))
+            {
+                Random rand = new Random();
+                int token = rand.Next(0, 1000000);
+                File.WriteAllText(pathy, token.ToString());
+                return token;
+            }
+            else
+            {
+                string token = File.ReadAllText(pathy);
+                return int.Parse(token);
+            }
 
 
+
+        }
 
     }
 }

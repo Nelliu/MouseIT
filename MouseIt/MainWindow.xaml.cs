@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -26,7 +27,6 @@ namespace MouseIt
 
 
         bool FileExists = false;
-        bool finished = true;
 
         List<Profile> profiles = new List<Profile>();
         double val;
@@ -47,8 +47,6 @@ namespace MouseIt
             if (File.Exists("profiles.json"))
             {
                 FileExists = true;
-
-
             }
 
 
@@ -67,49 +65,55 @@ namespace MouseIt
                 clickSpeed.Value = profiles[0].doubleClick;
                 scrollSpeed.Value = profiles[0].scrollSpeed;
 
-                finished = true;
-            
             }
             else // file doesnt exist
             {
-                profilePre.SelectedIndex = 1;
 
+                int uuid = SaveSystem.GetuID();
+                
+                
+
+
+                profilePre.SelectedIndex = 1;
                 Profile prof1 = new Profile();
+                prof1.uID = uuid;
                 prof1.name = "profile1";
                 prof1.mouseSpeed = Convert.ToInt32(val);
-                prof1.scrollSpeed = val3;
-                prof1.doubleClick = val2;
+                prof1.scrollSpeed = Convert.ToInt32(val3);
+                prof1.doubleClick = Convert.ToInt32(val2);
 
 
 
                 Profile prof2 = new Profile();
-                prof2.name = "profile1";
+                prof2.uID = uuid;
+                prof2.name = "profile2";
                 prof2.mouseSpeed = Convert.ToInt32(val);
-                prof2.scrollSpeed = val3;
-                prof2.doubleClick = val2;
+                prof2.scrollSpeed = Convert.ToInt32(val3);
+                prof2.doubleClick = Convert.ToInt32(val2);
 
                 profiles.Add(prof1);
                 profiles.Add(prof2);
 
                 SaveSystem.Save(profiles);
-                finished = true;
+          
 
             }
 
 
+            GetProfs(profiles);
 
 
 
-           // PointerEventArgs.CurrentPoint.PointerDevice.PointerDeviceType;
             
-           
-
-           
-
+            
 
 
         }
-
+        private async void GetProfs(List<Profile> profs)
+        {
+            profiles.Clear();
+            profs = await Api.Ask();
+        }
 
 
 
@@ -136,7 +140,7 @@ namespace MouseIt
             MouseOptions.SetScrollSpeed(scrollSpeed.Value);
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
 
             if (profilePre.SelectedIndex == 1 || profilePre.SelectedIndex == 2)
@@ -146,18 +150,19 @@ namespace MouseIt
                     File.Delete("profiles.json");
                     if (profilePre.SelectedIndex == 1)
                     {
-                        profiles[0].scrollSpeed = scrollSpeed.Value;
-                        profiles[0].doubleClick = clickSpeed.Value;
+                        profiles[0].scrollSpeed = Convert.ToInt32(scrollSpeed.Value);
+                        profiles[0].doubleClick = Convert.ToInt32(clickSpeed.Value);
                         profiles[0].mouseSpeed = Convert.ToInt32(speed.Value);
                     }
                     else
                     {
-                        profiles[1].scrollSpeed = scrollSpeed.Value;
-                        profiles[1].doubleClick = clickSpeed.Value;
+                        profiles[1].scrollSpeed = Convert.ToInt32(scrollSpeed.Value);
+                        profiles[1].doubleClick = Convert.ToInt32(clickSpeed.Value);
                         profiles[1].mouseSpeed = Convert.ToInt32(speed.Value);
                     }
                     SaveSystem.Save(profiles);
-                        
+                    string a = JsonConvert.SerializeObject(profiles);
+                    await Api.Send(JsonConvert.SerializeObject(profiles));
                 }
             }
 
@@ -188,6 +193,11 @@ namespace MouseIt
                 }
             }
             
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e) // adding button click
+        {
+
         }
     }
 }

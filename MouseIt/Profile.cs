@@ -8,10 +8,13 @@ namespace MouseIt
 {
     public class Profile
     {
+
+        
+        public int uID { get; set; }
         public string name { get; set; }
         public int mouseSpeed { get; set; }
-        public double doubleClick { get; set; }
-        public double scrollSpeed { get; set; }
+        public int doubleClick { get; set; }
+        public int scrollSpeed { get; set; }
         
 
 
